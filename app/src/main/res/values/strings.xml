@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Lab03b Shared Preferences</string>
+    <string name="top_left">0</string>
+    <string name="top_right">0</string>
+    <string name="bottom_right">0</string>
+    <string name="bottom_left">0</string>
+    <string name="display_timer">Time left: %1$d</string>
+    <string name="timer_length">Timer length is now %1$d seconds!</string>
+    <string name="cps_test">Click here to begin the CPS test</string>
+    <string name="cps_greeting">CPS: 0</string>
+    <string name="seekbar_instructions">choose timer length:</string>
+    <string name="personal_best">Personal best:</string>
+    <string name="click_count">Clicks: %1$d</string>
+</resources>
