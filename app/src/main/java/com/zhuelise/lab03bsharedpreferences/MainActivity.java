@@ -21,8 +21,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
     int timeLength = 0;
-    int startTime;
-    int endTime;
+    int personalBestCount= 0;
+    long startTime;
+    long endTime;
     SeekBar seekBar;
 
     @Override
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 timeLength = seekBar.getProgress() * 1000; //time in milliseconds
+                clickCount = 0;
+                displayCPS.setText(getString(R.string.click_count, clickCount));
             }
 
             @Override
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Snackbar snackbar = Snackbar.make(layout, getString(R.string.timer_length, seekBar.getProgress()), Snackbar.LENGTH_SHORT);
+                Snackbar snackbar = Snackbar.make(layout, getString(R.string.timer_length, seekBar.getProgress()), Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         });
@@ -67,11 +70,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if(clickCount==0)
-            //start time
-        if(!(startTime==endTime))
+        if(clickCount==0) {
+            startTime = System.currentTimeMillis();
+            endTime = startTime + timeLength;
+        }
+        if((System.currentTimeMillis())<=(endTime)) {
             clickCount++;
-        displayCPS.setText(getString(R.string.click_count, clickCount));
+            displayCPS.setText((getString(R.string.click_count, clickCount)).toString());
+        }
+        else {
+            startTime = 0;
+            endTime = 0;
+            if((clickCount>=personalBestCount)){
+                editor.putInt("personalBest", personalBestCount);
+                editor.apply();
+                personalBest.setText((getString(R.string.personal_best, personalBestCount)).toString());
+            }
+            displayCPS.setText(getString(R.string.cps, Integer.parseInt(String.valueOf(clickCount/(timeLength/1000)))));
+            clickCount = 0;
+        }
     }
 
     @Override
@@ -80,13 +97,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setInitialValues();
     }
     private void setInitialValues(){
-        personalBest.setText(preferences.getString("bottomRight", "Personal best:"));
+        personalBestCount = preferences.getInt("personalBest", 0);
+        personalBest.setText((getString(R.string.personal_best, personalBestCount)).toString());
         seekBar.setProgress(preferences.getInt("seekBar", 25));
     }
     @Override
     protected void onPause() {
         super.onPause();
-        editor.putString("personalBest", personalBest.getText().toString());
+        editor.putInt("personalBest", personalBestCount);
         editor.putInt("seekBar", seekBar.getProgress());
         editor.apply();
     }
