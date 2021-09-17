@@ -21,8 +21,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
     int timeLength = 0;
-    int personalBestCount= 0;
+    int personalBestCPS = 0;
     long startTime;
+    int currentCPS;
     long endTime;
     SeekBar seekBar;
 
@@ -81,12 +82,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             startTime = 0;
             endTime = 0;
-            if((clickCount>=personalBestCount)){
-                editor.putInt("personalBest", personalBestCount);
+            currentCPS = Integer.parseInt(String.valueOf(clickCount/(timeLength/1000)));
+
+            if((currentCPS>=personalBestCPS)){
+                editor.putInt("personalBest", personalBestCPS);
                 editor.apply();
-                personalBest.setText((getString(R.string.personal_best, personalBestCount)).toString());
+                personalBestCPS = currentCPS;
+                personalBest.setText((getString(R.string.personal_best, personalBestCPS)).toString());
             }
-            displayCPS.setText(getString(R.string.cps, Integer.parseInt(String.valueOf(clickCount/(timeLength/1000)))));
+            displayCPS.setText(getString(R.string.cps, personalBestCPS));
+            Snackbar snackbar = Snackbar.make(layout, getString(R.string.cps, currentCPS), Snackbar.LENGTH_LONG);
+            snackbar.show();
             clickCount = 0;
         }
     }
@@ -97,14 +103,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setInitialValues();
     }
     private void setInitialValues(){
-        personalBestCount = preferences.getInt("personalBest", 0);
-        personalBest.setText((getString(R.string.personal_best, personalBestCount)).toString());
+        personalBestCPS = preferences.getInt("personalBest", 0);
+        personalBest.setText((getString(R.string.personal_best, personalBestCPS)).toString());
         seekBar.setProgress(preferences.getInt("seekBar", 25));
     }
     @Override
     protected void onPause() {
         super.onPause();
-        editor.putInt("personalBest", personalBestCount);
+        editor.putInt("personalBest", personalBestCPS);
         editor.putInt("seekBar", seekBar.getProgress());
         editor.apply();
     }
